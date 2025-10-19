@@ -140,12 +140,12 @@ steps:
 
 
 # 6️⃣ Publish HTML Report as a downloadable artifact
-- task: PublishPipelineArtifact@1
+- task: PublishBuildArtifacts@1
   displayName: 'Publish HTML Test Report Artifact'
   inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)/target/reports'
-    artifact: 'HTML_Test_Report'
-    publishLocation: 'pipeline'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/target/reports'
+    ArtifactName: 'reports'
+    publishLocation: 'Container'
   condition: always()
 
 - script: |
@@ -159,11 +159,15 @@ steps:
   condition: always()
 
 - task: publishhtmlreport@1
-  displayName: 'Create HTML'
+  displayName: 'Publish HTML Report'
   inputs:
     htmlType: 'genericHTML'
-    htmlPath: '$(System.DefaultWorkingDirectory)\target\reports\index.html'
+    htmlPath: '$(System.DefaultWorkingDirectory)/target/reports/index.html'
+    reportFolder: '$(System.DefaultWorkingDirectory)/target/reports'
   condition: always()
+
+
+
 
 
 
