@@ -137,14 +137,13 @@ steps:
     failTaskOnFailedTests: true
 
 
-# 4️⃣ Publish HTML report as a downloadable artifact
+# 6️⃣ Publish HTML Report as a downloadable artifact
 - task: PublishPipelineArtifact@1
-  displayName: 'Publish HTML Report Artifact'
+  displayName: 'Publish HTML Test Report Artifact'
   inputs:
-    targetPath: '$(HTML_REPORT_DIR)'
+    targetPath: '$(System.DefaultWorkingDirectory)/target/reports'
     artifact: 'HTML_Test_Report'
     publishLocation: 'pipeline'
-  condition: always()
 
 
 
