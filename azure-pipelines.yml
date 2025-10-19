@@ -1,0 +1,129 @@
+# Maven
+# ============================================================ #
+# 🧪 Post-Deployment Automation Test Pipeline with Podman   #
+# ============================================================ #
+trigger: none
+
+resources:
+  pipelines:
+    - pipeline: DeployPipeline
+      source: 'sufian92.SeleniumFrameworkDesign'
+      trigger:
+        branches:
+          include:
+            - master
+
+pool:
+  name: SelfHostedPool
+
+steps:
+
+# 1️⃣ (Commented out) Recreate Selenium Grid network
+# - powershell: |
+#     Write-Host "Recreating Selenium Grid network..."
+# 
+#     if (podman network exists selenium-grid) {
+#         Write-Host "Network selenium-grid exists. Checking for attached containers..."
+#         $networkInfo = podman network inspect selenium-grid | ConvertFrom-Json
+#         $containers = $networkInfo.Containers.Keys
+# 
+#         foreach ($c in $containers) {
+#             if ($c) {
+#                 Write-Host "Stopping and removing attached container: $c"
+#                 podman rm -f $c
+#             }
+#         }
+# 
+#         Write-Host "Removing existing network..."
+#         podman network rm selenium-grid
+# 
+#         # Wait until network is fully removed
+#         do {
+#             Start-Sleep -Seconds 2
+#             $exists = podman network exists selenium-grid
+#         } while ($exists)
+#     }
+# 
+#     Write-Host "Creating new Selenium Grid network..."
+#     podman network create selenium-grid
+#     Write-Host "Network selenium-grid created."
+#   displayName: 'Recreate Selenium Grid Network'
+
+# 2️⃣ Run Selenium Hub container
+- powershell: |
+    Write-Host "Starting Selenium Hub container..."
+    podman run -d --name selenium-hub --network selenium-grid -p 4444:4444 selenium/hub:latest
+  displayName: 'Run Selenium Hub'
+
+# 3️⃣ Run Selenium Node (Edge) container
+- powershell: |
+    Write-Host "Starting Selenium Node (Edge) container..."
+    podman run -d --name selenium-node-edge `
+        --network selenium-grid `
+        -e SE_NODE_MAX_SESSIONS=5 `
+        -e SE_EVENT_BUS_HOST=selenium-hub `
+        -e SE_NODE_PORT=5555 `
+        -e SE_NODE_MAX_INSTANCES=5 `
+        selenium/node-edge:latest
+  displayName: 'Run Selenium Node (Edge)'
+
+# 4️⃣ Wait for Selenium Grid to be ready
+- powershell: |
+    Write-Host "Waiting for Selenium Grid..."
+    $maxRetries = 12
+    $retry = 0
+    do {
+        try {
+            $status = (Invoke-RestMethod -Uri http://localhost:4444/status).value.ready
+        } catch {
+            $status = $false
+        }
+        if ($status) {
+            Write-Host "Selenium Grid is ready!"
+            break
+        }
+        Write-Host "Waiting 5 seconds..."
+        Start-Sleep -Seconds 5
+        $retry++
+    } while ($retry -lt $maxRetries)
+
+    if (-not $status) {
+        Write-Error "Selenium Grid did not become ready in time."
+    }
+  displayName: 'Wait for Selenium Grid'
+
+# 5️⃣ Run Maven Tests
+- task: Maven@3
+  displayName: 'Run Automation Tests with Maven'
+  inputs:
+    mavenPomFile: 'pom.xml'
+    mavenOptions: '-Xmx3072m'
+    javaHomeOption: 'JDKVersion'
+    jdkVersionOption: '1.11'
+    jdkArchitectureOption: 'x64'
+    publishJUnitResults: true
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    goals: 'test'
+    options: >
+      -DargLine="-ea"
+      "-Dtest=junit.OrdersTests#submitOrderTest"
+      "-DBROWSER=chrome"
+      "-DRUN_ENVIRONMENT=LOCAL"
+      "-DRUN_CONFIGURATION=podman-grid"
+      "-DGRID_CONTAINER_NAME=selenium-grid"
+      "-DCHROME_IMAGE=selenium/node-chrome:latest"
+      "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
+
+# 6️⃣ Cleanup: stop and remove containers and network
+- powershell: |
+    Write-Host "Stopping and removing Selenium Node container..."
+    podman rm -f selenium-node-edge
+
+    Write-Host "Stopping and removing Selenium Hub container..."
+    podman rm -f selenium-hub
+
+    Write-Host "Removing Selenium Grid network..."
+    podman network rm selenium-grid
+  displayName: 'Cleanup Selenium Containers and Network'
+
+
