@@ -126,6 +126,7 @@ steps:
     Write-Host "Removing Selenium Grid network..."
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
+  condition: always()
 
 # 6️⃣ Publish JUnit Test Results
 - task: PublishTestResults@2
@@ -135,6 +136,7 @@ steps:
     testResultsFiles: '$(System.DefaultWorkingDirectory)/target/surefire-reports/TEST-*.xml'
     mergeTestResults: true
     failTaskOnFailedTests: true
+  condition: always()
 
 
 # 6️⃣ Publish HTML Report as a downloadable artifact
@@ -144,6 +146,7 @@ steps:
     targetPath: '$(System.DefaultWorkingDirectory)/target/reports'
     artifact: 'HTML_Test_Report'
     publishLocation: 'pipeline'
+  condition: always()
 
 
 
