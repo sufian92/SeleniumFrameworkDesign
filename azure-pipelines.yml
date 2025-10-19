@@ -157,11 +157,11 @@ steps:
   condition: always()
 
 - task: PublishHtmlReport@1
-  displayName: 'Publish Extent Report Inline in Azure DevOps'
+  displayName: 'Publish HTML Report'
   inputs:
-    reportDir: '$(System.DefaultWorkingDirectory)/target/reports'  # folder with HTML report
-    reportTitle: 'Extent Test Report'
-    reportName: 'ExtentReport'
+      reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
+      useFilenameTabs: true
+      tabName: MyReport
   condition: always()
 
 
