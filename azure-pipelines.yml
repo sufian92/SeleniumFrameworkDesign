@@ -150,6 +150,7 @@ steps:
 
 
 - task: publishhtmlreport@1
+  displayName: 'Create HTML'
   inputs:
     htmlType: 'genericHTML'
     htmlPath: '$(System.DefaultWorkingDirectory)/target/report/index.html'
