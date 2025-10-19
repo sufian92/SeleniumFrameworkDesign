@@ -150,6 +150,7 @@ steps:
 
 - script: dir $(System.DefaultWorkingDirectory)/target/reports
   displayName: 'List Report Files'
+  condition: always()
 
 - task: PublishHtmlReport@1
   displayName: 'Publish Extent Report Inline in Azure DevOps'
