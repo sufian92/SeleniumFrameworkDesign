@@ -18,36 +18,37 @@ pool:
 
 steps:
 
-# 1️⃣ (Commented out) Recreate Selenium Grid network
-# - powershell: |
-#     Write-Host "Recreating Selenium Grid network..."
-# 
-#     if (podman network exists selenium-grid) {
-#         Write-Host "Network selenium-grid exists. Checking for attached containers..."
-#         $networkInfo = podman network inspect selenium-grid | ConvertFrom-Json
-#         $containers = $networkInfo.Containers.Keys
-# 
-#         foreach ($c in $containers) {
-#             if ($c) {
-#                 Write-Host "Stopping and removing attached container: $c"
-#                 podman rm -f $c
-#             }
-#         }
-# 
-#         Write-Host "Removing existing network..."
-#         podman network rm selenium-grid
-# 
-#         # Wait until network is fully removed
-#         do {
-#             Start-Sleep -Seconds 2
-#             $exists = podman network exists selenium-grid
-#         } while ($exists)
-#     }
-# 
-#     Write-Host "Creating new Selenium Grid network..."
-#     podman network create selenium-grid
-#     Write-Host "Network selenium-grid created."
-#   displayName: 'Recreate Selenium Grid Network'
+# 1️⃣ Recreate Selenium Grid network
+- powershell: |
+    Write-Host "Recreating Selenium Grid network..."
+
+    if (podman network exists selenium-grid) {
+        Write-Host "Network selenium-grid exists. Checking for attached containers..."
+        $networkInfo = podman network inspect selenium-grid | ConvertFrom-Json
+        $containers = $networkInfo.Containers.Keys
+
+        foreach ($c in $containers) {
+            if ($c) {
+                Write-Host "Stopping and removing attached container: $c"
+                podman rm -f $c
+            }
+        }
+
+        Write-Host "Removing existing network..."
+        podman network rm selenium-grid
+
+        # Wait until network is fully removed
+        do {
+            Start-Sleep -Seconds 2
+            $exists = podman network exists selenium-grid
+        } while ($exists)
+    }
+
+    Write-Host "Creating new Selenium Grid network..."
+    podman network create selenium-grid
+    Write-Host "Network selenium-grid created."
+  displayName: 'Recreate Selenium Grid Network'
+
 
 # 2️⃣ Run Selenium Hub container
 - powershell: |
