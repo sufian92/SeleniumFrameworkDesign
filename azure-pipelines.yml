@@ -129,20 +129,23 @@ steps:
 
 # 3️⃣ Verify HTML report exists and normalize path
 - powershell: |
+    # Normalize to pure Windows backslashes
     $reportDir = "$(System.DefaultWorkingDirectory)\target\reports"
-    $reportFile = "$reportDir\index.html"
-    if (Test-Path $reportFile) {
-        Write-Host "✅ HTML report exists at $reportFile"
-        if ((Get-Item $reportFile).Length -eq 0) {
-            Write-Host "❌ HTML report is empty!"
-            exit 1
-        }
-        Write-Host "##vso[task.setvariable variable=HTML_REPORT_DIR]$reportDir"
-    } else {
-        Write-Host "❌ HTML report not found!"
+    $reportFile = Join-Path $reportDir "index.html"
+
+    if (!(Test-Path $reportFile)) {
+        Write-Host "❌ HTML report not found at $reportFile"
         exit 1
     }
-  displayName: 'Verify and Normalize HTML Report Path'
+
+    if ((Get-Item $reportFile).Length -eq 0) {
+        Write-Host "❌ HTML report is empty!"
+        exit 1
+    }
+
+    Write-Host "✅ HTML report verified at $reportFile"
+    Write-Host "##vso[task.setvariable variable=HTML_REPORT_DIR]$reportDir"
+  displayName: 'Verify HTML Report Exists'
   condition: always()
 
 
