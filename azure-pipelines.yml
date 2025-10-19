@@ -149,9 +149,13 @@ steps:
   condition: always()
 
 - script: |
-    echo $(System.DefaultWorkingDirectory)
-    dir $(System.DefaultWorkingDirectory)\target\report\
-  displayName: 'Check file path'
+    echo "Checking for index.html file"
+    if exist "$(System.DefaultWorkingDirectory)\target\report\index.html" (
+      echo File found
+    ) else (
+      echo File not found
+    )
+  displayName: 'Check for index.html file'
   condition: always()
 
 - task: publishhtmlreport@1
