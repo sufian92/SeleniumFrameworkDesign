@@ -149,10 +149,10 @@ steps:
   condition: always()
 
 
-- task: PublishHtmlReport@1
-  displayName: 'Publish HTML Report'
+- task: publishhtmlreport@1
   inputs:
-      reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
+    htmlType: 'genericHTML'
+    htmlPath: '$(System.DefaultWorkingDirectory)/target/report/index.html'
   condition: always()
 
 
