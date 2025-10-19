@@ -109,13 +109,16 @@ steps:
         "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
   displayName: 'Run Tests in Maven Container'
 
-# 6️⃣ Cleanup: stop and remove containers and network
+# 6️⃣ Cleanup: stop and remove containers and network, including Maven container
 - powershell: |
     Write-Host "Stopping and removing Selenium Node container..."
     podman rm -f selenium-node-edge
 
     Write-Host "Stopping and removing Selenium Hub container..."
     podman rm -f selenium-hub
+
+    Write-Host "Stopping and removing Maven JDK 11 container..."
+    podman rm -f maven-jdk11-container
 
     Write-Host "Removing Selenium Grid network..."
     podman network rm selenium-grid
