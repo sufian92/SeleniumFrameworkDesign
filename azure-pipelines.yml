@@ -7,7 +7,7 @@ trigger: none
 resources:
   pipelines:
     - pipeline: DeployPipeline
-      source: 'sufian92.SeleniumFrameworkDesign'
+      source: 'sufian92.d5'
       trigger:
         branches:
           include:
