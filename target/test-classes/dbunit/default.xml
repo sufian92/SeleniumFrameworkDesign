@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <CONTACTS/>
+    <COUNTRIES/>
+    <CUSTOMERS/>
+    <EMPLOYEES/>
+    <INVENTORIES/>
+    <LOCATIONS/>
+    <ORDERS/>
+    <ORDER_ITEMS/>
+    <PRODUCTS/>
+    <REGIONS/>
+    <WAREHOUSES/>
+
+</dataset>
