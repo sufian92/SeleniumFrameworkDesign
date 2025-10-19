@@ -126,4 +126,12 @@ steps:
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
 
+# 7️⃣ Publish HTML Report (Viewable in Azure UI)
+- task: PublishHtmlReport@1
+  displayName: 'Publish HTML Report to Azure DevOps'
+  inputs:
+    reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
+    reportTitle: 'Selenium Automation HTML Report'
+    reportName: 'Automation_HTML_Report'
+
 
