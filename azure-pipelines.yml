@@ -158,13 +158,18 @@ steps:
     publishLocation: 'pipeline'
   condition: always()
 
-# 5️⃣ Publish HTML report in Azure DevOps UI
-- task: PublishHtmlReport@1
-  displayName: 'Publish HTML Report to Azure DevOps UI'
-  inputs:
-    reportDir: '$(HTML_REPORT_DIR)'
-    reportTitle: 'Selenium Automation HTML Report'
-    reportName: 'Automation_HTML_Report'
+# 8️⃣ Provide clickable link in pipeline summary
+- powershell: |
+    $artifactName = "HTML_Test_Report"
+    $reportFile = "$(HTML_REPORT_DIR)\index.html"
+    
+    # Construct URL to artifact (Azure DevOps automatically replaces this link in the build summary)
+    $artifactUrl = "$(Build.ArtifactStagingDirectory)/$artifactName/index.html"
+
+    Write-Host "✅ HTML report is published as artifact: $artifactName"
+    Write-Host "You can download and view the report here:"
+    Write-Host "##vso[task.logissue type=warning]HTML Report: $(Build.ArtifactStagingDirectory)/$artifactName/index.html"
+  displayName: 'Provide clickable HTML report link'
   condition: always()
 
 
