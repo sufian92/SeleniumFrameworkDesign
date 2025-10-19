@@ -153,8 +153,6 @@ steps:
   displayName: 'Publish HTML Report'
   inputs:
       reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
-      useFilenameTabs: true
-      tabName: MyReport
   condition: always()
 
 
