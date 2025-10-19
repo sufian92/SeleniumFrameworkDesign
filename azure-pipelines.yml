@@ -127,12 +127,33 @@ steps:
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
 
-# 7️⃣ Publish HTML Report (Viewable in Azure UI)
-- task: PublishHtmlReport@1
-  displayName: 'Publish HTML Report to Azure DevOps'
+# 6️⃣ Debug - Verify HTML report exists
+- powershell: |
+    Write-Host "🔍 Locating HTML report..."
+    $report = Get-ChildItem -Recurse $(System.DefaultWorkingDirectory) | Where-Object { $_.Name -eq "index.html" }
+    if ($report) {
+        Write-Host "Found report at: $($report.FullName)"
+    } else {
+        Write-Host "No report found!"
+    }
+  displayName: 'Debug - Locate HTML Report'
+
+# 7️⃣ Publish HTML Report as Artifact
+- task: PublishPipelineArtifact@1
+  displayName: 'Publish HTML Report Artifact'
   inputs:
-    reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
+    targetPath: '$(System.DefaultWorkingDirectory)/**/reports'
+    artifact: 'HTML_Test_Report'
+    publishLocation: 'pipeline'
+  condition: always()
+
+# 8️⃣ Publish HTML Report (Viewable in Azure UI)
+- task: PublishHtmlReport@1
+  displayName: 'Publish HTML Report to Azure DevOps UI'
+  inputs:
+    reportDir: '$(System.DefaultWorkingDirectory)/SeleniumFrameworkDesign/target/reports' # Adjust if debug shows different path
     reportTitle: 'Selenium Automation HTML Report'
     reportName: 'Automation_HTML_Report'
+  condition: always()
 
 
