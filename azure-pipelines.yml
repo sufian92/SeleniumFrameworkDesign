@@ -127,33 +127,39 @@ steps:
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
 
-# 6️⃣ Verify HTML report exists
+# 3️⃣ Verify HTML report exists and normalize path
 - powershell: |
-    $reportPath = "$(System.DefaultWorkingDirectory)/target/reports/index.html"
-    if (Test-Path $reportPath) {
-        Write-Host "✅ HTML report exists at $reportPath"
+    $reportDir = "$(System.DefaultWorkingDirectory)\target\reports"
+    $reportFile = "$reportDir\index.html"
+    if (Test-Path $reportFile) {
+        Write-Host "✅ HTML report exists at $reportFile"
+        if ((Get-Item $reportFile).Length -eq 0) {
+            Write-Host "❌ HTML report is empty!"
+            exit 1
+        }
+        Write-Host "##vso[task.setvariable variable=HTML_REPORT_DIR]$reportDir"
     } else {
         Write-Host "❌ HTML report not found!"
         exit 1
     }
-  displayName: 'Verify HTML Report Exists'
+  displayName: 'Verify and Normalize HTML Report Path'
   condition: always()
 
 
-# 7️⃣ Publish HTML Report as Artifact
+# 4️⃣ Publish HTML report as a downloadable artifact
 - task: PublishPipelineArtifact@1
   displayName: 'Publish HTML Report Artifact'
   inputs:
-    targetPath: '$(System.DefaultWorkingDirectory)/target/reports'
+    targetPath: '$(HTML_REPORT_DIR)'
     artifact: 'HTML_Test_Report'
     publishLocation: 'pipeline'
   condition: always()
 
-# 8️⃣ Publish HTML Report (Viewable in Azure UI)
+# 5️⃣ Publish HTML report in Azure DevOps UI
 - task: PublishHtmlReport@1
   displayName: 'Publish HTML Report to Azure DevOps UI'
   inputs:
-    reportDir: '$(System.DefaultWorkingDirectory)/target/reports'
+    reportDir: '$(HTML_REPORT_DIR)'
     reportTitle: 'Selenium Automation HTML Report'
     reportName: 'Automation_HTML_Report'
   condition: always()
