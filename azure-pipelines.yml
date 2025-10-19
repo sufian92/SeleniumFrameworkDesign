@@ -150,7 +150,7 @@ steps:
 
 - script: |
     echo "Checking for index.html file"
-    if exist "$(System.DefaultWorkingDirectory)\target\report\index.html" (
+    if exist "$(System.DefaultWorkingDirectory)\target\reports\index.html" (
       echo File found
     ) else (
       echo File not found
@@ -162,7 +162,7 @@ steps:
   displayName: 'Create HTML'
   inputs:
     htmlType: 'genericHTML'
-    htmlPath: '$(System.DefaultWorkingDirectory)\target\report\index.html'
+    htmlPath: '$(System.DefaultWorkingDirectory)\target\reports\index.html'
   condition: always()
 
 
