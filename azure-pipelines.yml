@@ -148,23 +148,13 @@ steps:
     publishLocation: 'Container'
   condition: always()
 
-- script: |
-    echo "Checking for index.html file"
-    if exist "$(System.DefaultWorkingDirectory)\target\reports\index.html" (
-      echo File found
-    ) else (
-      echo File not found
-    )
-  displayName: 'Check for index.html file'
-  condition: always()
-
-- task: publishhtmlreport@1
-  displayName: 'Publish HTML Report'
-  inputs:
-    htmlType: 'genericHTML'
-    htmlPath: '$(System.DefaultWorkingDirectory)/target/reports/index.html'
-    reportFolder: '$(System.DefaultWorkingDirectory)/target/reports'
-  condition: always()
+ #- task: publishhtmlreport@1
+ # displayName: 'Publish HTML Report'
+ # inputs:
+ #   htmlType: 'genericHTML'
+ #   htmlPath: '$(System.DefaultWorkingDirectory)/target/reports/index.html'
+ #   reportFolder: '$(System.DefaultWorkingDirectory)/target/reports'
+ # condition: always()
 
 
 
