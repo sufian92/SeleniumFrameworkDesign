@@ -127,26 +127,14 @@ steps:
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
 
-# 3️⃣ Verify HTML report exists and normalize path
-- powershell: |
-    # Normalize to pure Windows backslashes
-    $reportDir = "$(System.DefaultWorkingDirectory)\target\reports"
-    $reportFile = Join-Path $reportDir "index.html"
-
-    if (!(Test-Path $reportFile)) {
-        Write-Host "❌ HTML report not found at $reportFile"
-        exit 1
-    }
-
-    if ((Get-Item $reportFile).Length -eq 0) {
-        Write-Host "❌ HTML report is empty!"
-        exit 1
-    }
-
-    Write-Host "✅ HTML report verified at $reportFile"
-    Write-Host "##vso[task.setvariable variable=HTML_REPORT_DIR]$reportDir"
-  displayName: 'Verify HTML Report Exists'
-  condition: always()
+# 6️⃣ Publish JUnit Test Results
+- task: PublishTestResults@2
+  displayName: 'Publish JUnit Test Results'
+  inputs:
+    testResultsFormat: 'JUnit'
+    testResultsFiles: '$(System.DefaultWorkingDirectory)/target/surefire-reports/TEST-*.xml'
+    mergeTestResults: true
+    failTaskOnFailedTests: true
 
 
 # 4️⃣ Publish HTML report as a downloadable artifact
@@ -158,18 +146,6 @@ steps:
     publishLocation: 'pipeline'
   condition: always()
 
-# 8️⃣ Provide clickable link in pipeline summary
-- powershell: |
-    $artifactName = "HTML_Test_Report"
-    $reportFile = "$(HTML_REPORT_DIR)\index.html"
-    
-    # Construct URL to artifact (Azure DevOps automatically replaces this link in the build summary)
-    $artifactUrl = "$(Build.ArtifactStagingDirectory)/$artifactName/index.html"
 
-    Write-Host "✅ HTML report is published as artifact: $artifactName"
-    Write-Host "You can download and view the report here:"
-    Write-Host "##vso[task.logissue type=warning]HTML Report: $(Build.ArtifactStagingDirectory)/$artifactName/index.html"
-  displayName: 'Provide clickable HTML report link'
-  condition: always()
 
 
