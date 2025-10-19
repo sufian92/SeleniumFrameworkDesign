@@ -148,12 +148,17 @@ steps:
     publishLocation: 'pipeline'
   condition: always()
 
+- script: |
+    echo $(System.DefaultWorkingDirectory)
+    dir $(System.DefaultWorkingDirectory)\target\report\
+  displayName: 'Check file path'
+  condition: always()
 
 - task: publishhtmlreport@1
   displayName: 'Create HTML'
   inputs:
     htmlType: 'genericHTML'
-    htmlPath: '$(System.DefaultWorkingDirectory)/target/report/index.html'
+    htmlPath: '$(System.DefaultWorkingDirectory)\target\report\index.html'
   condition: always()
 
 
