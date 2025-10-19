@@ -148,8 +148,12 @@ steps:
     publishLocation: 'pipeline'
   condition: always()
 
-- script: dir $(System.DefaultWorkingDirectory)/target/reports
-  displayName: 'List Report Files'
+- script: |
+    echo "Listing files in report folder:"
+    dir "$(System.DefaultWorkingDirectory)/target/reports"
+    echo "File sizes:"
+    for %f in ($(System.DefaultWorkingDirectory)/target/reports/*) do @echo %~zf
+  displayName: 'Debug HTML Report Folder'
   condition: always()
 
 - task: PublishHtmlReport@1
