@@ -4,14 +4,14 @@
 # ============================================================ #
 trigger: none
 
-resources:
-  pipelines:
-    - pipeline: DeployPipeline
-      source: 'sufian92.d5'
-      trigger:
-        branches:
-          include:
-            - master
+#resources:
+#  pipelines:
+#    - pipeline: DeployPipeline
+#      source: 'sufian92.d5'
+#      trigger:
+#        branches:
+#          include:
+#            - master
 
 pool:
   name: SelfHostedPool
