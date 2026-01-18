@@ -48,7 +48,7 @@ public class OrdersTests extends UITestBase {
 
         LandingPage landingPage = new LandingPage(driver);
         landingPage.goTo();
-        ProductCatalogue productCatalogue = landingPage.loginApplication("anshika@gmail.com", "Iamking@000");
+//        ProductCatalogue productCatalogue = landingPage.loginApplication("anshika@gmail.com", "Iamking@000");
 
         // to be set in the extent report
         this.setActualAndExpectedImgagesThread(SnapShotEnum.PRODUCTS_PAGE.getName());
