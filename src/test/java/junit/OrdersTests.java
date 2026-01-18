@@ -50,12 +50,12 @@ public class OrdersTests extends UITestBase {
         landingPage.goTo();
         ProductCatalogue productCatalogue = landingPage.loginApplication("anshika@gmail.com", "Iamking@000");
 
-//        // to be set in the extent report
-//        this.setActualAndExpectedImgagesThread(SnapShotEnum.PRODUCTS_PAGE.getName());
-//
-//        // compare two snapshots
-//        SnapShotHelper.compareSnapShots(driverThread.get(), SnapShotEnum.PRODUCTS_PAGE.getName(),
-//                new File(SnapShotEnum.PRODUCTS_PAGE.getFile()));
+        // to be set in the extent report
+        this.setActualAndExpectedImgagesThread(SnapShotEnum.PRODUCTS_PAGE.getName());
+
+        // compare two snapshots
+        SnapShotHelper.compareSnapShots(driverThread.get(), SnapShotEnum.PRODUCTS_PAGE.getName(),
+                new File(SnapShotEnum.PRODUCTS_PAGE.getFile()));
 
 
     }
