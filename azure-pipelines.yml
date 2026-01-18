@@ -108,7 +108,7 @@ steps:
         "-DRUN_CONFIGURATION=podman-grid" `
         "-DGRID_CONTAINER_NAME=selenium-grid" `
         "-DCHROME_IMAGE=selenium/node-chrome:latest" `
-        "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
+        "-DSELENIUM_GRID_URL=http://selenium-hub:4444/wd/hub"
 
     # Capture Maven exit code
     $exitCode = $LASTEXITCODE
