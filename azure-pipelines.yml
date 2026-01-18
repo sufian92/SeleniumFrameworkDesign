@@ -94,8 +94,8 @@ steps:
 
 # 5️⃣ Create Maven Container with JDK 11 using Podman and run tests inside the container
 - powershell: |
-    Write-Host "Creating Maven container with JDK 11..."
-    podman run --rm -d --name maven-jdk11-container --network selenium-grid `
+    Write-Host "Running Maven tests inside container..."
+    podman run --rm --name maven-jdk11-container --network selenium-grid `
         -v $(System.DefaultWorkingDirectory):/mnt/workspace `
         -w /mnt/workspace `
         maven:3.8-openjdk-11-slim `
@@ -107,7 +107,13 @@ steps:
         "-DGRID_CONTAINER_NAME=selenium-grid" `
         "-DCHROME_IMAGE=selenium/node-chrome:latest" `
         "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Maven tests failed with exit code $LASTEXITCODE"
+        exit $LASTEXITCODE
+    }
   displayName: 'Run Tests in Maven Container'
+
 
 # 6️⃣ Cleanup: stop and remove containers and network, including Maven container
 - powershell: |
