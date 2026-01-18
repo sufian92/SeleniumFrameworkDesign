@@ -92,9 +92,11 @@ steps:
     }
   displayName: 'Wait for Selenium Grid'
 
-# 5️⃣ Create Maven Container with JDK 11 using Podman and run tests inside the container
+  # 5️⃣ Run Maven tests in container (foreground) with proper exit code
 - powershell: |
     Write-Host "Running Maven tests inside container..."
+
+    # Run Maven in foreground (remove -d)
     podman run --rm --name maven-jdk11-container --network selenium-grid `
         -v $(System.DefaultWorkingDirectory):/mnt/workspace `
         -w /mnt/workspace `
@@ -108,9 +110,14 @@ steps:
         "-DCHROME_IMAGE=selenium/node-chrome:latest" `
         "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
 
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Maven tests failed with exit code $LASTEXITCODE"
-        exit $LASTEXITCODE
+    # Capture Maven exit code
+    $exitCode = $LASTEXITCODE
+    Write-Host "Maven exited with code: $exitCode"
+
+    # Fail pipeline if Maven failed
+    if ($exitCode -ne 0) {
+        Write-Error "Maven tests failed. Failing the pipeline."
+        exit $exitCode
     }
   displayName: 'Run Tests in Maven Container'
 
