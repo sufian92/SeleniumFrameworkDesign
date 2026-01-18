@@ -65,7 +65,7 @@ public class SeleniumHelper {
         }
 
         // Create and return the RemoteWebDriver instance pointing to the grid hub
-        return new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
+        return new RemoteWebDriver(new URL("http://selenium-hub:4444/wd/hub"), capabilities);
     }
 
     private static WebDriver createLocalWebDriver(String browserName) {
