@@ -4,14 +4,14 @@
 # ============================================================ #
 trigger: none
 
-resources:
-  pipelines:
-    - pipeline: DeployPipeline
-      source: 'sufian92.d5'
-      trigger:
-        branches:
-          include:
-            - master
+#resources:
+#  pipelines:
+#    - pipeline: DeployPipeline
+#      source: 'sufian92.d5'
+#      trigger:
+#        branches:
+#          include:
+#            - master
 
 pool:
   name: SelfHostedPool
@@ -48,7 +48,6 @@ steps:
     podman network create selenium-grid
     Write-Host "Network selenium-grid created."
   displayName: 'Recreate Selenium Grid Network'
-
 
 # 2️⃣ Run Selenium Hub container
 - powershell: |
@@ -93,29 +92,24 @@ steps:
     }
   displayName: 'Wait for Selenium Grid'
 
-# 5️⃣ Run Maven Tests
-- task: Maven@3
-  displayName: 'Run Automation Tests with Maven'
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'test'
-    options: >
-      -DargLine="-ea"
-      "-Dtest=junit.OrdersTests#submitOrderTest"
-      "-DBROWSER=chrome"
-      "-DRUN_ENVIRONMENT=LOCAL"
-      "-DRUN_CONFIGURATION=podman-grid"
-      "-DGRID_CONTAINER_NAME=selenium-grid"
-      "-DCHROME_IMAGE=selenium/node-chrome:latest"
-      "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
+# 5️⃣ Create Maven Container with JDK 11 using Podman and run tests inside the container
+- powershell: |
+    Write-Host "Creating Maven container with JDK 11..."
+    podman run --rm -d --name maven-jdk11-container --network selenium-grid `
+        -v $(System.DefaultWorkingDirectory):/mnt/workspace `
+        -w /mnt/workspace `
+        maven:3.8-openjdk-11-slim `
+        mvn test -DargLine="-ea" `
+        "-Dtest=junit.OrdersTests#submitOrderTest" `
+        "-DBROWSER=chrome" `
+        "-DRUN_ENVIRONMENT=LOCAL" `
+        "-DRUN_CONFIGURATION=podman-grid" `
+        "-DGRID_CONTAINER_NAME=selenium-grid" `
+        "-DCHROME_IMAGE=selenium/node-chrome:latest" `
+        "-DSELENIUM_GRID_URL=http://localhost:4444/wd/hub"
+  displayName: 'Run Tests in Maven Container'
 
-# 6️⃣ Cleanup: stop and remove containers and network
+# 6️⃣ Cleanup: stop and remove containers and network, including Maven container
 - powershell: |
     Write-Host "Stopping and removing Selenium Node container..."
     podman rm -f selenium-node-edge
@@ -123,12 +117,15 @@ steps:
     Write-Host "Stopping and removing Selenium Hub container..."
     podman rm -f selenium-hub
 
+    Write-Host "Stopping and removing Maven JDK 11 container..."
+    podman rm -f maven-jdk11-container
+
     Write-Host "Removing Selenium Grid network..."
     podman network rm selenium-grid
   displayName: 'Cleanup Selenium Containers and Network'
   condition: always()
 
-# 6️⃣ Publish JUnit Test Results
+# 7️⃣ Publish JUnit Test Results
 - task: PublishTestResults@2
   displayName: 'Publish JUnit Test Results'
   inputs:
@@ -139,7 +136,7 @@ steps:
   condition: always()
 
 
-# 6️⃣ Publish HTML Report as a downloadable artifact
+# 8️⃣ Publish HTML Report as a downloadable artifact
 - task: PublishBuildArtifacts@1
   displayName: 'Publish HTML Test Report Artifact'
   inputs:
@@ -147,18 +144,3 @@ steps:
     ArtifactName: 'reports'
     publishLocation: 'Container'
   condition: always()
-
- #- task: publishhtmlreport@1
- # displayName: 'Publish HTML Report'
- # inputs:
- #   htmlType: 'genericHTML'
- #   htmlPath: '$(System.DefaultWorkingDirectory)/target/reports/index.html'
- #   reportFolder: '$(System.DefaultWorkingDirectory)/target/reports'
- # condition: always()
-
-
-
-
-
-
-
